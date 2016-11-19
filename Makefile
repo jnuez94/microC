@@ -16,4 +16,4 @@ clean:
 	rm -rf microc *.pd
 
 build:
-	ocamlbuild -use-ocamlfind -pkgs llvm, llvm.analysis -cflags -w, +a-4 microc.native
+	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 microc.native
