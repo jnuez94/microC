@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 (* Code generation: translate takes a semantically checked AST and
 produces LLVM IR
 
@@ -182,4 +181,3 @@ let translate (globals, functions) =
 
   List.iter build_function_body functions;
   the_module
-
