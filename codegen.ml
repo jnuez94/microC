@@ -1,6 +1,19 @@
 module L = Llvm (* LLVM VMCore interface library *)
 module A = Ast (* MicroC Abstract Syntax Tree *)
 module StringMap = Map.Make(String)
+
+let add_terminal builder f =
+	match L.block_terminator (L.insertion_block builder) with
+		Some _ -> ()
+	| None -> ignore (f builder) in
+
+let rec stmt builder = function
+		A.Block sl -> List.fold_left stmt builder sl
+	| A.Expr e -> ignore (expr builder e); builder
+	| A.Return e -> ignore (match fdecl.A.typ with
+			A.Void -> L.build_ret_void builder
+		| _ -> L.build_ret (expr builder e) builder); builder
+
 let translate (globals, functions) =
 	let context = L.global_context () in (* global data container *)
 	let the_module = L.create_module context "MicroC" (* container *)
@@ -104,17 +117,6 @@ let translate (globals, functions) =
 				| _ -> f ^ "_result") in
 				L.build_call fdef (Array.of_list actuals) result builder
 
-				let add_terminal builder f =
-					match L.block_terminator (L.insertion_block builder) with
-						Some _ -> ()
-					| None -> ignore (f builder) in
-
-				let rec stmt builder = function
-						A.Block sl -> List.fold_left stmt builder sl
-					| A.Expr e -> ignore (expr builder e); builder
-					| A.Return e -> ignore (match fdecl.A.typ with
-							A.Void -> L.build_ret_void builder
-						| _ -> L.build_ret (expr builder e) builder); builder
 		| A.If (predicate, then_stmt, else_stmt) ->
 				let bool_val = expr builder predicate in
 				let merge_bb = L.append_block context
